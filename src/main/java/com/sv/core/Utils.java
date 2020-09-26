@@ -1,0 +1,214 @@
+package com.sv.core;
+
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.util.Arrays;
+
+/**
+ * Created by svg on 11-Oct-2017
+ */
+public class Utils {
+
+    public static final String EMPTY = "";
+    public static final String SPACE = " ";
+    public static final String ELLIPSIS = "..";
+    public static final String SLASH = "\\";
+    public static final String SEMI_COLON = ";";
+    public static final String DOUBLE_SPACE = SPACE + SPACE;
+    public static final String DASH = "-";
+    public static final String SP_DASH_SP = SPACE + DASH + SPACE;
+
+    // Set of values that imply a true value.
+    private static final String[] trueValues = {"Y", "YES", "TRUE", "T"};
+
+    // Set of values that imply a false value.
+    private static final String[] falseValues = {"N", "NO", "FALSE", "F"};
+
+    public static String escape(String data) {
+        for (HtmlEsc h : HtmlEsc.values()) {
+            if (data.contains(h.getCh())) {
+                data = data.replaceAll(h.getCh(), h.getEscStr());
+            }
+        }
+        return data;
+    }
+
+    enum HtmlEsc {
+        SP(" ", "&nbsp;"),
+        LT("<", "&lt;"),
+        GT(">", "&gt;"),
+        SQ("'", "&#39;"),
+        DQ("\"", "&quot;"),
+        AMP("&", "&amp;");
+
+        String ch, escStr;
+
+        public String getCh() {
+            return ch;
+        }
+
+        public String getEscStr() {
+            return escStr;
+        }
+
+        HtmlEsc(String ch, String escStr) {
+            this.ch = ch;
+            this.escStr = escStr;
+        }
+    }
+
+
+    /**
+     * return true if param has non-null value
+     *
+     * @param item string to be checked
+     * @return boolean status of operation
+     */
+    public static boolean hasValue(String item) {
+        return ((item != null) && (item.length() > 0));
+    }
+
+    public static Path createPath(String path) {
+        return FileSystems.getDefault().getPath(path);
+    }
+
+    public static boolean isInArray(String[] arr, String val) {
+        return Arrays.stream(arr).anyMatch(a -> a.equalsIgnoreCase(val));
+    }
+
+    /**
+     * Return the boolean equivalent of the string argument.
+     *
+     * @param value Value containing string representation of a boolean value.
+     * @return Boolean true/false depending on the value of the input.
+     * @throws Exception Thrown if input does not have a valid value.
+     */
+    public static boolean getBoolean(String value) throws Exception {
+        if (!hasValue(value)) {
+            throw new Exception("ERROR: Can't convert a null/empty string value to a boolean."); //throw new Exception("ERROR: Can't convert a null/empty string value to a boolean."); throw new Exception("ERROR: Can't convert a null/empty string value to a boolean.");
+        }
+
+        value = value.trim();
+
+        for (String trueValue : trueValues) {
+            if (value.equalsIgnoreCase(trueValue))
+                return true;
+        }
+
+        for (String falseValue1 : falseValues) {
+            if (value.equalsIgnoreCase(falseValue1))
+                return false;
+        }
+
+        //Construct error message containing list of valid values
+        StringBuilder validValues = new StringBuilder();
+
+        for (int Ix = 0; Ix < trueValues.length; Ix++) {
+            if (Ix > 0)
+                validValues.append(", ");
+
+            validValues.append(trueValues[Ix]);
+        }
+
+        for (String falseValue : falseValues) {
+            validValues.append(", ");
+            validValues.append(falseValue);
+        }
+
+        throw new Exception("ERROR: Candidate boolean value [" + value
+                + "] not in valid-value set [" + validValues.toString() + "].");
+    }
+
+
+    /**
+     * Return the boolean equivalent of the string argument.
+     *
+     * @param value       Value containing string representation of a boolean value.
+     * @param defaultBool Default boolean to use if the value is empty
+     *                    or if it is an invalid value.
+     * @return Boolean true/false depending on the value of the input.
+     * @throws Exception Thrown if input does not have a valid value.
+     */
+    public static boolean getBoolean(String value, boolean defaultBool) throws Exception {
+        if (!hasValue(value))
+            return defaultBool;
+
+        try {
+            return getBoolean(value);
+        } catch (Exception e) {
+            return defaultBool;
+        }
+    }
+
+    /**
+     * returns true if char is numeric, else false
+     *
+     * @param ch char to check
+     * @return boolean status of operation
+     */
+    public static boolean isNumeric(char ch) {
+        int zero = '0';
+        int nine = '9';
+
+        return (int) ch <= nine && (int) ch >= zero;
+    }
+
+    /**
+     * returns true if char is alphabetic, else false
+     *
+     * @param ch char to check
+     * @return boolean status of operation
+     */
+    public static boolean isAlphabet(char ch) {
+        int a = 'a';
+        int A = 'A';
+        int z = 'z';
+        int Z = 'Z';
+
+        return ((int) ch <= z && (int) ch >= a) || (((int) ch <= Z && (int) ch >= A));
+    }
+
+
+    public static String getFileNameNoExtn(String file, String fileType) {
+        if (!hasValue(file))
+            return "";
+        if (!hasValue(fileType))
+            return file;
+        return (file.endsWith(fileType)) ? file.substring(0, file.indexOf(fileType) - 1) : file;
+    }
+
+    public static void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void sleep(long millis, MyLogger logger) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            logger.warn(e.getMessage());
+        }
+    }
+
+    public static String getFileSizeString(long fs) {
+        long KB = 1024;
+        float inKB = (float) fs / KB;
+        float inMB = inKB / KB;
+        float inGB = inMB / KB;
+        if (inGB > 1) {
+            return String.format("[%sGB]", formatFloat(inGB));
+        } else if (inMB > 1) {
+            return String.format("[%sMB]", formatFloat(inMB));
+        } else if (inKB > 1) {
+            return String.format("[%sKB]", formatFloat(inKB));
+        }
+        return String.format("[%sBytes]", fs);
+    }
+
+    private static String formatFloat(float size) {
+        return String.format("%.2f", size);
+    }
+}
