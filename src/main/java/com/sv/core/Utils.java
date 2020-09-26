@@ -211,4 +211,9 @@ public class Utils {
     private static String formatFloat(float size) {
         return String.format("%.2f", size);
     }
+
+    public static String[] getConfigsAsArr(Class<? extends Enum<?>> e) {
+        return Arrays.stream(e.getEnumConstants()).map(Enum::name).toArray(String[]::new);
+    }
+
 }
