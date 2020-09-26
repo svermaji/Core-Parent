@@ -54,15 +54,15 @@ public class MyLogger {
         }
     }
 
-    void warn(String message) {
+    public void warn(String message) {
         log("WARN: " + message);
     }
 
-    void error(String message) {
+    public void error(String message) {
         log("ERROR: " + message);
     }
 
-    void error(Throwable throwable) {
+    public void error(Throwable throwable) {
         StringWriter sw = new StringWriter();
         throwable.printStackTrace(new PrintWriter(sw));
         error(sw.toString());
@@ -75,7 +75,7 @@ public class MyLogger {
      *
      * @param message - debug statement
      */
-    void log(String message) {
+    public void log(String message) {
         try {
             if (logWriter != null) {
                 synchronized (logWriter) {
