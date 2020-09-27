@@ -4,9 +4,32 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.sv</groupId>
-    <artifactId>core</artifactId>
+    <artifactId>core-parent</artifactId>
     <version>1.0</version>
-    <name>Core for Config Logger Utils</name>
+    <packaging>pom</packaging>
+    <name>Core Parent</name>
+
+    <profiles>
+        <profile>
+            <id>jdk-8-config</id>
+            <activation>
+                <jdk>1.8</jdk>
+            </activation>
+            <properties>
+                <javadocExecutable>${java.home}/../bin/javadoc</javadocExecutable>
+            </properties>
+        </profile>
+        <profile>
+            <id>jdk-11-config</id>
+            <activation>
+                <jdk>11</jdk>
+            </activation>
+            <properties>
+                <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
+            </properties>
+        </profile>
+    </profiles>
+
     <build>
         <plugins>
             <plugin>
@@ -17,6 +40,23 @@
                     <source>8</source>
                     <target>8</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <show>private</show>
+                    <nohelp>true</nohelp>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
