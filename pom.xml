@@ -30,14 +30,6 @@
         </profile>
     </profiles>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.sv</groupId>
-            <artifactId>core</artifactId>
-            <version>1.0</version>
-        </dependency>
-    </dependencies>
-
     <build>
         <plugins>
             <plugin>
